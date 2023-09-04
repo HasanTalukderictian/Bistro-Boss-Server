@@ -32,15 +32,42 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
+    const usersCollection = client.db("bistroDB").collection("users");
     const menuCollection = client.db("bistroDB").collection("menu");
     const reviewsCollection = client.db("bistroDB").collection("reviews");
     const cartCollection = client.db("bistroDB").collection("carts");
+    
+    // get all users
+    app.get('/users', async(req, res) =>{
+      const result = await usersCollection.find().toArray()
+      res.send(result);
+    })
 
 
+
+
+   // menu related Apis 
     app.get('/menu', async(req, res)=>{
         const result = await menuCollection.find().toArray();
         res.send(result);
     })
+
+    // review related Apis
+    app.post('/users', async(req, res)=>{
+      const users = req.body;
+      const query = {email: users.email}
+      const existingUser = await usersCollection.findOne(query);
+    
+      if(existingUser){
+         return res.send({ message:'Users Already Exists'})
+      }
+     
+
+      const result = await usersCollection.insertOne(users)
+      res.send(result);
+    })
+
+
     app.get('/reviews', async(req, res)=>{
         const result = await reviewsCollection.find().toArray();
         res.send(result);
@@ -68,7 +95,7 @@ async function run() {
     })
 
     // delete item 
-    app.cart('/carts/:id', async(req, res) =>{
+    app.delete('/carts/:id', async(req, res) =>{
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
