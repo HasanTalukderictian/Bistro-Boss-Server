@@ -43,6 +43,17 @@ async function run() {
       res.send(result);
     })
 
+    // update for specfic Id 
+    app.patch('/users/admin:id', async(res, req)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'admin'
+        },
+      };
+    })
+
 
 
 
